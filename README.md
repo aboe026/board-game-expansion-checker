@@ -1,6 +1,6 @@
-# typescript-template
+# board-game-expansion-checker
 
-A launching point for a TypeScript repository
+Tool to check if any new expansions for board games are released.
 
 ## Requirements
 
@@ -62,9 +62,9 @@ yarn start
 
 The script takes the following environment variables:
 
-| Name | Required | Default | Description | Example(s) |
-| ---- | -------- | ------- | ----------- | ---------- |
-| FOO  | No       | bar     | `buzz`      |            |
+| Name         | Required | Default | Description                                           | Example(s) |
+| ------------ | -------- | ------- | ----------------------------------------------------- | ---------- |
+| BGG_USERNAME | Yes      |         | The Board Game Geek username to scope owned games to. |            |
 
 ## Build
 
