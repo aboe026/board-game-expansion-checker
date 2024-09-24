@@ -62,9 +62,10 @@ yarn start
 
 The script takes the following environment variables:
 
-| Name         | Required | Default | Description                                           | Example(s) |
-| ------------ | -------- | ------- | ----------------------------------------------------- | ---------- |
-| BGG_USERNAME | Yes      |         | The Board Game Geek username to scope owned games to. |            |
+| Name                  | Required | Default | Description                                                                   | Example(s)        |
+| --------------------- | -------- | ------- | ----------------------------------------------------------------------------- | ----------------- |
+| BGG_USERNAME          | Yes      |         | The Board Game Geek username to scope owned games to.                         |                   |
+| GAME_IGNORE_FILE_PATH | No       |         | Path to file containing newline separated list of board game names to ignore. | gamesToIgnore.txt |
 
 ## Build
 
@@ -87,3 +88,13 @@ To lint code for programmatic and stylistic error detection, run
 ```sh
 yarn lint
 ```
+
+## ToDo
+
+- Ability to ignore expansions based on name
+- Ability to filter on only "new" expansions (that haven't been found since last check)
+- Email if new expansions found
+- log4js
+- unit tests
+- Wiremock func tests
+- CI
