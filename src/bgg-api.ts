@@ -1,6 +1,7 @@
 import xml2js from 'xml2js'
 import sleep from './sleep'
 import chunk from './chunks'
+import env from './env'
 
 export default class BggApi {
   static async getCollectionGames({
@@ -44,6 +45,7 @@ export default class BggApi {
             return {
               id: Number(link.$.id),
               type: link.$.type,
+              value: link.$.value,
             }
           }),
         })
@@ -58,7 +60,7 @@ export default class BggApi {
     let response = await fetch(url)
     const status = response.status
     if (status === 202) {
-      await sleep(2)
+      await sleep(env.RETRY_WAIT_SECONDS)
       response = await fetch(url)
     }
     const text = await response.text()
@@ -81,6 +83,7 @@ export interface BoardGame extends CollectionGame {
   links?: {
     id: number
     type: string
+    value: string
   }[]
 }
 

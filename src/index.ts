@@ -12,6 +12,7 @@ import env from './env'
 ;(async () => {
   try {
     const gameNameFilter = await getGamesToIgnore()
+    const expansionFilter = await getExpansionsToIgnore()
 
     console.log('Getting collection...')
     const collectionGames = await BggApi.getCollectionGames({
@@ -37,7 +38,7 @@ import env from './env'
     for (const game of games) {
       if (game.links) {
         for (const link of game.links) {
-          if (link.type === ItemType.Expansion) {
+          if (link.type === ItemType.Expansion && !expansionFilter.includes(link.value)) {
             expansionIds.push(link.id)
             expansionToBaseGameMap[link.id] = game
           }
@@ -80,32 +81,41 @@ import env from './env'
  * @returns An array of game names to ignore.
  */
 async function getGamesToIgnore(): Promise<string[]> {
-  const gameNameFilter: string[] = []
-  if (env.GAME_IGNORE_FILE_PATH) {
-    console.log(`GAME_IGNORE_FILE_PATH set to "${env.GAME_IGNORE_FILE_PATH}", reading file for games to ignore.`)
-    let gameIgnorePath = env.GAME_IGNORE_FILE_PATH
-    if (!path.isAbsolute(gameIgnorePath)) {
+  const gameNames = await getFileItems(env.GAME_IGNORE_FILE_PATH, 'GAME_IGNORE_FILE_PATH')
+  console.log(`Excluding games: "${JSON.stringify(gameNames)}"`)
+  return gameNames
+}
+
+async function getExpansionsToIgnore(): Promise<string[]> {
+  const expansionNames = await getFileItems(env.EXPANSION_IGNORE_FILE_PATH, 'EXPANSION_IGNORE_FILE_PATH')
+  console.log(`Excluding expansions: "${JSON.stringify(expansionNames)}"`)
+  return expansionNames
+}
+
+async function getFileItems(filePath: string, envVarName: string): Promise<string[]> {
+  const items: string[] = []
+  if (filePath) {
+    console.log(`${envVarName} set to "${filePath}", reading file for games to ignore.`)
+    let resolvedFilePath = filePath
+    if (!path.isAbsolute(resolvedFilePath)) {
       const relativeDir = path.join(__dirname, '..')
-      console.log(
-        `GAME_IGNORE_FILE_PATH value "${env.GAME_IGNORE_FILE_PATH}" is not absolute, making relative to "${relativeDir}"`
-      )
-      gameIgnorePath = path.join(relativeDir, gameIgnorePath)
+      console.log(`${envVarName} value "${filePath}" is not absolute, making relative to "${relativeDir}"`)
+      resolvedFilePath = path.join(relativeDir, resolvedFilePath)
     }
     try {
-      await fs.access(gameIgnorePath)
+      await fs.access(resolvedFilePath)
     } catch (err: unknown) {
-      throw Error(`Could not read file "${gameIgnorePath}": ${err}`)
+      throw Error(`Could not read file "${resolvedFilePath}": ${err}`)
     }
-    const contents = await fs.readFile(env.GAME_IGNORE_FILE_PATH, {
+    const contents = await fs.readFile(resolvedFilePath, {
       encoding: 'utf-8',
     })
     for (const line of contents.split(/\n|\r\n/)) {
-      const gameName = line.trim()
-      if (gameName) {
-        gameNameFilter.push(line.trim())
+      const trimmedLine = line.trim()
+      if (trimmedLine && !trimmedLine.startsWith('#')) {
+        items.push(line.trim())
       }
     }
-    console.log(`Excluding games: "${JSON.stringify(gameNameFilter)}"`)
   }
-  return gameNameFilter
+  return items
 }
