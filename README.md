@@ -62,12 +62,13 @@ yarn start
 
 The script takes the following environment variables:
 
-| Name                       | Required | Default | Description                                                                            | Example(s)             |
-| -------------------------- | -------- | ------- | -------------------------------------------------------------------------------------- | ---------------------- |
-| BGG_USERNAME               | Yes      |         | The Board Game Geek username to scope owned games to.                                  | bond007                |
-| EXPANSION_IGNORE_FILE_PATH | No       |         | Path to file containing newline separated list of expansion names to ignore.           | expansionsToIgnore.txt |
-| GAME_IGNORE_FILE_PATH      | No       |         | Path to file containing newline separated list of board game names to ignore.          | gamesToIgnore.txt      |
-| RETRY_WAIT_SECONDS         | Yes      | 5       | The amount of seconds to wait to retry a request if initially rejected for processing. | 10                     |
+| Name                       | Required | Default | Description                                                                                                                   | Example(s)             |
+| -------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| BGG_USERNAME               | Yes      |         | The Board Game Geek username to scope owned games to.                                                                         | bond007                |
+| EXPANSION_IGNORE_FILE_PATH | No       |         | Path to file containing newline separated list of expansion names to ignore.                                                  | expansionsToIgnore.txt |
+| GAME_IGNORE_FILE_PATH      | No       |         | Path to file containing newline separated list of board game names to ignore.                                                 | gamesToIgnore.txt      |
+| LOG_LEVEL                  | Yes      | INFO    | The minimum granularity level of log messages that should be output. OFF < FATAL < ERROR < WARN < INFO < DEBUG < TRACE < ALL. | DEBUG                  |
+| RETRY_WAIT_SECONDS         | Yes      | 5       | The amount of seconds to wait to retry a request if initially rejected for processing.                                        | 10                     |
 
 ## Build
 

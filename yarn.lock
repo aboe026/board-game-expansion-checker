@@ -524,6 +524,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"date-format@npm:^4.0.14":
+  version: 4.0.14
+  resolution: "date-format@npm:4.0.14"
+  checksum: 10c0/1c67a4d77c677bb880328c81d81f5b9ed7fbf672bdaff74e5a0f7314b21188f3a829b06acf120c70cc1df876a7724e3e5c23d511e86d64656a3035a76ac3930b
+  languageName: node
+  linkType: hard
+
 "debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4":
   version: 4.3.7
   resolution: "debug@npm:4.3.7"
@@ -840,7 +847,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"flatted@npm:^3.2.9":
+"flatted@npm:^3.2.7, flatted@npm:^3.2.9":
   version: 3.3.1
   resolution: "flatted@npm:3.3.1"
   checksum: 10c0/324166b125ee07d4ca9bcf3a5f98d915d5db4f39d711fba640a3178b959919aae1f7cfd8aabcfef5826ed8aa8a2aa14cc85b2d7d18ff638ddf4ae3df39573eaf
@@ -854,6 +861,17 @@ __metadata:
     cross-spawn: "npm:^7.0.0"
     signal-exit: "npm:^4.0.1"
   checksum: 10c0/028f1d41000553fcfa6c4bb5c372963bf3d9bf0b1f25a87d1a6253014343fb69dfb1b42d9625d7cf44c8ba429940f3d0ff718b62105d4d4a4f6ef8ca0a53faa2
+  languageName: node
+  linkType: hard
+
+"fs-extra@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "fs-extra@npm:8.1.0"
+  dependencies:
+    graceful-fs: "npm:^4.2.0"
+    jsonfile: "npm:^4.0.0"
+    universalify: "npm:^0.1.0"
+  checksum: 10c0/259f7b814d9e50d686899550c4f9ded85c46c643f7fe19be69504888e007fcbc08f306fae8ec495b8b998635e997c9e3e175ff2eeed230524ef1c1684cc96423
   languageName: node
   linkType: hard
 
@@ -932,6 +950,13 @@ __metadata:
     merge2: "npm:^1.4.1"
     slash: "npm:^3.0.0"
   checksum: 10c0/b39511b4afe4bd8a7aead3a27c4ade2b9968649abab0a6c28b1a90141b96ca68ca5db1302f7c7bd29eab66bf51e13916b8e0a3d0ac08f75e1e84a39b35691189
+  languageName: node
+  linkType: hard
+
+"graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0":
+  version: 4.2.11
+  resolution: "graceful-fs@npm:4.2.11"
+  checksum: 10c0/386d011a553e02bc594ac2ca0bd6d9e4c22d7fa8cfbfc448a6d148c59ea881b092db9dbe3547ae4b88e55f1b01f7c4a2ecc53b310c042793e63aa44cf6c257f2
   languageName: node
   linkType: hard
 
@@ -1079,6 +1104,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jsonfile@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "jsonfile@npm:4.0.0"
+  dependencies:
+    graceful-fs: "npm:^4.1.6"
+  dependenciesMeta:
+    graceful-fs:
+      optional: true
+  checksum: 10c0/7dc94b628d57a66b71fb1b79510d460d662eb975b5f876d723f81549c2e9cd316d58a2ddf742b2b93a4fa6b17b2accaf1a738a0e2ea114bdfb13a32e5377e480
+  languageName: node
+  linkType: hard
+
 "keyv@npm:^4.5.3":
   version: 4.5.4
   resolution: "keyv@npm:4.5.4"
@@ -1111,6 +1148,19 @@ __metadata:
   version: 4.6.2
   resolution: "lodash.merge@npm:4.6.2"
   checksum: 10c0/402fa16a1edd7538de5b5903a90228aa48eb5533986ba7fa26606a49db2572bf414ff73a2c9f5d5fd36b31c46a5d5c7e1527749c07cbcf965ccff5fbdf32c506
+  languageName: node
+  linkType: hard
+
+"log4js@npm:6.9.1":
+  version: 6.9.1
+  resolution: "log4js@npm:6.9.1"
+  dependencies:
+    date-format: "npm:^4.0.14"
+    debug: "npm:^4.3.4"
+    flatted: "npm:^3.2.7"
+    rfdc: "npm:^1.3.0"
+    streamroller: "npm:^3.1.5"
+  checksum: 10c0/05846e48f72d662800c8189bd178c42b4aa2f0c574cfc90a1942cf90b76f621c44019e26796c8fd88da1b6f0fe8272cba607cbaad6ae6ede50a7a096b58197ea
   languageName: node
   linkType: hard
 
@@ -1348,6 +1398,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rfdc@npm:^1.3.0":
+  version: 1.4.1
+  resolution: "rfdc@npm:1.4.1"
+  checksum: 10c0/4614e4292356cafade0b6031527eea9bc90f2372a22c012313be1dcc69a3b90c7338158b414539be863fa95bfcb2ddcd0587be696841af4e6679d85e62c060c7
+  languageName: node
+  linkType: hard
+
 "rimraf@npm:5.0.5":
   version: 5.0.5
   resolution: "rimraf@npm:5.0.5"
@@ -1422,6 +1479,17 @@ __metadata:
   version: 3.0.0
   resolution: "slash@npm:3.0.0"
   checksum: 10c0/e18488c6a42bdfd4ac5be85b2ced3ccd0224773baae6ad42cfbb9ec74fc07f9fa8396bd35ee638084ead7a2a0818eb5e7151111544d4731ce843019dab4be47b
+  languageName: node
+  linkType: hard
+
+"streamroller@npm:^3.1.5":
+  version: 3.1.5
+  resolution: "streamroller@npm:3.1.5"
+  dependencies:
+    date-format: "npm:^4.0.14"
+    debug: "npm:^4.3.4"
+    fs-extra: "npm:^8.1.0"
+  checksum: 10c0/0bdeec34ad37487d959ba908f17067c938f544db88b5bb1669497a67a6b676413229ce5a6145c2812d06959ebeb8842e751076647d4b323ca06be612963b9099
   languageName: node
   linkType: hard
 
@@ -1596,6 +1664,7 @@ __metadata:
     eslint: "npm:8.57.0"
     eslint-config-prettier: "npm:9.1.0"
     eslint-plugin-prettier: "npm:5.1.3"
+    log4js: "npm:6.9.1"
     prettier: "npm:3.2.5"
     rimraf: "npm:5.0.5"
     ts-node: "npm:10.9.2"
@@ -1628,6 +1697,13 @@ __metadata:
   version: 6.19.8
   resolution: "undici-types@npm:6.19.8"
   checksum: 10c0/078afa5990fba110f6824823ace86073b4638f1d5112ee26e790155f481f2a868cc3e0615505b6f4282bdf74a3d8caad715fd809e870c2bb0704e3ea6082f344
+  languageName: node
+  linkType: hard
+
+"universalify@npm:^0.1.0":
+  version: 0.1.2
+  resolution: "universalify@npm:0.1.2"
+  checksum: 10c0/e70e0339f6b36f34c9816f6bf9662372bd241714dc77508d231d08386d94f2c4aa1ba1318614f92015f40d45aae1b9075cd30bd490efbe39387b60a76ca3f045
   languageName: node
   linkType: hard
 

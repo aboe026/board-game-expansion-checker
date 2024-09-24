@@ -1,9 +1,13 @@
+import { getLogger } from 'log4js'
 import xml2js from 'xml2js'
+
 import sleep from './sleep'
 import chunk from './chunks'
 import env from './env'
 
 export default class BggApi {
+  private static logger = getLogger('BggApi')
+
   static async getCollectionGames({
     exclude,
     include,
@@ -21,13 +25,15 @@ export default class BggApi {
       queryParams.push(`excludesubtype=${exclude}`)
     }
     const response = await BggApi.request<CollectionResponse>(`collection?${queryParams.join('&')}`)
-    return response.items.item.map((item) => {
+    const games = response.items.item.map((item) => {
       return {
         id: Number(item.$.objectid),
         name: item.name[0]._,
         year: Number(item.yearpublished),
       }
     })
+    BggApi.logger.trace(`getCollectionGames games: "${JSON.stringify(games)}"`)
+    return games
   }
 
   static async getGames({ ids, type }: { ids: number[]; type: ItemType }): Promise<BoardGame[]> {
@@ -51,20 +57,27 @@ export default class BggApi {
         })
       }
     }
+    BggApi.logger.trace(`getGames games: "${JSON.stringify(games)}"`)
 
     return games
   }
 
   private static async request<T>(path: string): Promise<T> {
     const url = `https://boardgamegeek.com/xmlapi2/${path}`
+    BggApi.logger.trace(`request - Sending request to URL: "${url}"`)
     let response = await fetch(url)
     const status = response.status
+    BggApi.logger.trace(`request - status: "${response.status}"`)
     if (status === 202) {
+      BggApi.logger.debug(`Retrying request in "${env.RETRY_WAIT_SECONDS}" seconds...`)
       await sleep(env.RETRY_WAIT_SECONDS)
       response = await fetch(url)
     }
     const text = await response.text()
-    return xml2js.parseStringPromise(text)
+    BggApi.logger.trace(`request - text: "${text}"`)
+    const json = await xml2js.parseStringPromise(text)
+    BggApi.logger.trace(`request - json: "${JSON.stringify(json)}"`)
+    return json as T
   }
 }
 
