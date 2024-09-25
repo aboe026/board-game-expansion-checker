@@ -6,11 +6,9 @@ import path from 'path'
 
 import BggApi, { BoardGame, ItemType } from './bgg-api'
 import env from './env'
+import Log from './log'
 
-log4js.configure({
-  appenders: { out: { type: 'stdout' } },
-  categories: { default: { appenders: ['out'], level: env.LOG_LEVEL } },
-})
+Log.configure()
 const logger = log4js.getLogger('index')
 
 /**
@@ -102,7 +100,9 @@ const logger = log4js.getLogger('index')
     }
   } catch (err: unknown) {
     logger.error(err)
-    process.exit(1)
+    process.exitCode = 1
+  } finally {
+    log4js.shutdown()
   }
 })()
 

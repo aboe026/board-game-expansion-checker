@@ -67,6 +67,10 @@ The script takes the following environment variables:
 | BGG_USERNAME               | Yes      |         | The Board Game Geek username to scope owned games to.                                                                         | bond007                |
 | EXPANSION_IGNORE_FILE_PATH | No       |         | Path to file containing newline separated list of expansion names to ignore.                                                  | expansionsToIgnore.txt |
 | GAME_IGNORE_FILE_PATH      | No       |         | Path to file containing newline separated list of board game names to ignore.                                                 | gamesToIgnore.txt      |
+| LOG_FILE_BACKUPS           | Yes      | 0       | The number of old log files to keep during log rolling (excluding the hot file).                                              | 5                      |
+| LOG_FILE_MAX_SIZE_UNITS    | Yes      | M       | The units for the maximum log file size. Used in conjunction with LOG_FILE_MAX_SIZE_VALUE.                                    | G                      |
+| LOG_FILE_MAX_SIZE_VALUE    | Yes      | 10      | The maximum size of the log file. Units specified with LOG_FILE_MAX_SIZE_UNITS.                                               | 3                      |
+| LOG_FILE_NAME              | No       |         | The name of a file to output logs to.                                                                                         | output.log             |
 | LOG_LEVEL                  | Yes      | INFO    | The minimum granularity level of log messages that should be output. OFF < FATAL < ERROR < WARN < INFO < DEBUG < TRACE < ALL. | DEBUG                  |
 | RETRY_WAIT_SECONDS         | Yes      | 5       | The amount of seconds to wait to retry a request if initially rejected for processing.                                        | 10                     |
 
@@ -96,7 +100,6 @@ yarn lint
 
 - Ability to filter on only "new" expansions (that haven't been found since last check)
 - Email if new expansions found
-- log4js
 - unit tests
 - Wiremock func tests
 - CI
