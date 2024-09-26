@@ -4,9 +4,10 @@ import fs from 'fs/promises'
 import log4js from 'log4js'
 import path from 'path'
 
-import BggApi, { BoardGame, ItemType } from './bgg-api'
+import BggApi, { BoardGame, GameWithExpansions, ItemType } from './bgg-api'
 import env from './env'
 import Log from './log'
+import Emailer from './emailer'
 
 Log.configure()
 const logger = log4js.getLogger('index')
@@ -73,33 +74,44 @@ const logger = log4js.getLogger('index')
     const ownedExpansionIds = ownedExpansions.map((expansion) => expansion.id)
     logger.trace(`ownedExpansionIds: "${JSON.stringify(ownedExpansionIds)}"`)
 
-    const unownedExpansions: {
-      game: BoardGame
-      expansion: BoardGame
-    }[] = []
+    let unownedExpansionsCount = 0
+    const unownedGameExpansions: GameWithExpansions[] = []
     for (const possibleExpansion of possibleExpansions) {
+      logger.trace(`possibleExpansion: "${JSON.stringify(possibleExpansion)}"`)
       if (ownedExpansionIds.includes(possibleExpansion.id)) {
         logger.debug(`Expansion "${possibleExpansion.name}" already owned`)
       } else {
-        unownedExpansions.push({
-          expansion: possibleExpansion,
-          game: expansionToBaseGameMap[possibleExpansion.id],
-        })
+        unownedExpansionsCount++
+        const baseGame = expansionToBaseGameMap[possibleExpansion.id]
+        logger.trace(`baseGame: "${JSON.stringify(baseGame)}"`)
+        const index = unownedGameExpansions.findIndex((gameWithExpansion) => gameWithExpansion.game.id === baseGame.id)
+        logger.trace(`index: "${JSON.stringify(index)}"`)
+        if (index < 0) {
+          unownedGameExpansions.push({
+            game: baseGame,
+            expansions: [possibleExpansion],
+          })
+        } else {
+          unownedGameExpansions[index].expansions.push(possibleExpansion)
+        }
       }
     }
-    if (unownedExpansions.length === 0) {
+    if (unownedExpansionsCount === 0) {
       logger.info('No unowned expansions found.')
     } else {
-      logger.info(`Found "${unownedExpansions.length}" unowned expansions:`)
+      logger.info(`Found "${unownedExpansionsCount}" unowned expansions:`)
       logger.info('-------------------------------------------------------------')
-      for (const unownedExpansion of unownedExpansions) {
-        logger.info(
-          `Game "${unownedExpansion.game.name}" has an expansion "${unownedExpansion.expansion.name}" available "${unownedExpansion.expansion.year}"`
-        )
+      for (const unownedGameExpansion of unownedGameExpansions) {
+        for (const unownedExpansion of unownedGameExpansion.expansions) {
+          logger.info(
+            `Game "${unownedGameExpansion.game.name}" has an expansion "${unownedExpansion.name}" available "${unownedExpansion.year}"`
+          )
+        }
       }
+      await Emailer.send(unownedGameExpansions)
     }
   } catch (err: unknown) {
-    logger.error(err)
+    logger.fatal(err)
     process.exitCode = 1
   } finally {
     log4js.shutdown()

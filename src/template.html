@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+
+      .main {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <table>
+        <caption>
+          {EXPS_NUMBER} New Expansion(s) Available
+        </caption>
+        <thead>
+          <tr>
+            <th>Game</th>
+            <th>Expansion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Expansion Rows Start -->
+          <tr>
+            <td><a href="https://google.com">Name of Game</a></td>
+            <td>
+              <ul>
+                <li>
+                  <a href="https://google.com">Name of Expansion One</a>
+                </li>
+                <li>
+                  <a href="https://google.com">Name of Expansion Two</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <!-- Expansion Rows End -->
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

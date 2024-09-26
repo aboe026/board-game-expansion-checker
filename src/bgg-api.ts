@@ -143,3 +143,8 @@ interface GamesResponse {
     }[]
   }
 }
+
+export interface GameWithExpansions {
+  game: BoardGame
+  expansions: BoardGame[]
+}
