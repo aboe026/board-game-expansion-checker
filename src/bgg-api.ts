@@ -17,7 +17,7 @@ export default class BggApi {
     include?: ItemType
     exclude?: ItemType
   }): Promise<CollectionGame[]> {
-    const queryParams = [`username=${username}`, 'own=1']
+    const queryParams = [`username=${username}`]
     if (include) {
       queryParams.push(`subtype=${include}`)
     }
@@ -25,11 +25,12 @@ export default class BggApi {
       queryParams.push(`excludesubtype=${exclude}`)
     }
     const response = await BggApi.request<CollectionResponse>(`collection?${queryParams.join('&')}`)
-    const games = response.items.item.map((item) => {
+    const games: CollectionGame[] = response.items.item.map((item) => {
       return {
         id: Number(item.$.objectid),
         name: item.name[0]._,
         year: Number(item.yearpublished),
+        owned: item.status[0].$.own === '1',
       }
     })
     BggApi.logger.trace(`getCollectionGames games: "${JSON.stringify(games)}"`)
@@ -90,9 +91,13 @@ interface CollectionGame {
   name: string
   year: number
   id: number
+  owned: boolean
 }
 
-export interface BoardGame extends CollectionGame {
+export interface BoardGame {
+  name: string
+  year: number
+  id: number
   links?: {
     id: number
     type: string
@@ -111,6 +116,19 @@ interface CollectionResponse {
         _: string
       }[]
       yearpublished: string[]
+      status: {
+        $: {
+          own: string
+          prevowned: string
+          fortrade: string
+          want: string
+          wanttoplay: string
+          wanttobuy: string
+          wishlist: string
+          preordered: string
+          lastmodified: string
+        }
+      }[]
     }[]
   }
 }
@@ -142,4 +160,9 @@ interface GamesResponse {
       }[]
     }[]
   }
+}
+
+export interface GameWithExpansions {
+  game: BoardGame
+  expansions: BoardGame[]
 }
