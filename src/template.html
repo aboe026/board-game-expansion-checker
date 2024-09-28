@@ -38,21 +38,22 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Expansion Rows Start -->
+          <!-- Game Row Start -->
           <tr>
-            <td><a href="https://google.com">Name of Game</a></td>
+            <td>
+              <a href="https://boardgamegeek.com/boardgame/{GAME_ID}">{GAME_NAME}</a>
+            </td>
             <td>
               <ul>
+                <!-- Expansion Row Start -->
                 <li>
-                  <a href="https://google.com">Name of Expansion One</a>
+                  <a href="https://boardgamegeek.com/boardgameexpansion/{EXPANSION_ID}">{EXPANSION_NAME}</a>
                 </li>
-                <li>
-                  <a href="https://google.com">Name of Expansion Two</a>
-                </li>
+                <!-- Expansion Row End -->
               </ul>
             </td>
           </tr>
-          <!-- Expansion Rows End -->
+          <!-- Game Row End -->
         </tbody>
       </table>
     </div>

@@ -30,52 +30,70 @@ export default class Emailer {
         encoding: 'utf-8',
       })
 
-      const tableRowIndentMatches = [...template.matchAll(/^(\s+)<tr>/gm)]
-      let tableRowIndent = ''
-      if (tableRowIndentMatches) {
-        tableRowIndent += tableRowIndentMatches[0][1].replace('\n', '')
-      }
-      let gameRows = ''
+      const gameRowStart = Emailer.getBetweenHtmlComments({
+        html: template,
+        start: '<!-- Game Row Start -->',
+        end: '<!-- Expansion Row Start -->',
+      })
+      Emailer.logger.trace(`gameRowStart: "${gameRowStart}"`)
+      const gameRowEnd = Emailer.getBetweenHtmlComments({
+        html: template,
+        start: '<!-- Expansion Row End -->',
+        end: '<!-- Game Row End -->',
+      })
+      Emailer.logger.trace(`gameRowEnd: "${gameRowEnd}"`)
+      const expansionRow = Emailer.getBetweenHtmlComments({
+        html: template,
+        start: '<!-- Expansion Row Start -->',
+        end: '<!-- Expansion Row End -->',
+      })
+      Emailer.logger.trace(`expansionRow: "${expansionRow}"`)
+
+      let rendered = Emailer.getBetweenHtmlComments({
+        html: template,
+        end: '<!-- Game Row Start -->',
+      })
+      Emailer.logger.trace(`rendered before: "${rendered}"`)
       let expansionsCount = 0
-      for (const gamesWithExpansion of gamesWithExpansions) {
-        let expansionRows = ''
-        for (const expansion of gamesWithExpansion.expansions) {
+      for (const gameWithExpansions of gamesWithExpansions) {
+        rendered += '\n'
+        rendered += gameRowStart
+          .replace('{GAME_ID}', gameWithExpansions.game.id.toString())
+          .replace('{GAME_NAME}', gameWithExpansions.game.name)
+        for (const expansion of gameWithExpansions.expansions) {
           expansionsCount++
-          expansionRows += [
-            '      <li>',
-            `        <a href="https://boardgamegeek.com/boardgameexpansion/${expansion.id}">${expansion.name}</a>`,
-            '      </li>',
-          ].join(`\n${tableRowIndent}`)
+          rendered += '\n'
+          rendered += expansionRow
+            .replace('{EXPANSION_ID}', expansion.id.toString())
+            .replace('{EXPANSION_NAME}', expansion.name)
         }
-        gameRows += [
-          '<tr>',
-          '  <td>',
-          `    <a href="https://boardgamegeek.com/boardgame/${gamesWithExpansion.game.id}">${gamesWithExpansion.game.name}</a>`,
-          '  </td>',
-          '  <td>',
-          '    <ul>',
-          expansionRows,
-          '    </ul>',
-          '  </td>',
-          '</tr>',
-        ].join(`\n${tableRowIndent}`)
+        rendered += gameRowEnd
       }
-      let modifiedTemplate = template.replace('{EXPS_NUMBER}', expansionsCount.toString())
-      const gameRowsStartText = '<!-- Expansion Rows Start -->'
-      const gameRowsStartIndex = modifiedTemplate.indexOf(gameRowsStartText)
-      const gameRowsEndText = '<!-- Expansion Rows End -->'
-      const gameRowsEndIndex = modifiedTemplate.indexOf(gameRowsEndText) + gameRowsEndText.length
-      modifiedTemplate = `${modifiedTemplate.substring(0, gameRowsStartIndex + gameRowsStartText.length)}${modifiedTemplate.substring(gameRowsEndIndex, modifiedTemplate.length)}`
-      modifiedTemplate = modifiedTemplate.replace(gameRowsStartText, gameRows)
-      Emailer.logger.trace(`modifiedTemplate: "${JSON.stringify(modifiedTemplate)}"`)
+      rendered += '\n'
+      rendered += Emailer.getBetweenHtmlComments({
+        html: template,
+        start: '<!-- Game Row End -->',
+      })
+      rendered = rendered.replace('{EXPS_NUMBER}', expansionsCount.toString())
+      Emailer.logger.trace(`rendered after: "${rendered}"`)
 
       const response = await Emailer.transporter.sendMail({
         from: env.SMTP_USERNAME,
         to: env.SMTP_USERNAME,
         subject: `New Board Game Expansion${expansionsCount > 1 ? 's' : ''} Available`,
-        html: modifiedTemplate,
+        html: rendered,
       })
       Emailer.logger.trace(`response: "${JSON.stringify(response)}"`)
     }
+  }
+
+  private static getBetweenHtmlComments({ html, start, end }: { html: string; start?: string; end?: string }): string {
+    const startIndex = start ? html.indexOf(start) + start.length : 0
+    const endIndex = end ? html.indexOf(end) : html.length
+
+    return html
+      .substring(startIndex, endIndex)
+      .replace(/^\s+[\n|\r\n]/g, '') // remove potential starting newline
+      .replace(/[\n|\r\n]\s+$/g, '') // remove potential ending empty whitespace line
   }
 }
