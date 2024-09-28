@@ -28,7 +28,7 @@ const logger = log4js.getLogger('index')
     })
     const filteredCollectionGames =
       gameNameFilter.length > 0
-        ? collectionGames.filter((game) => !gameNameFilter.includes(game.name))
+        ? collectionGames.filter((game) => game.owned && !gameNameFilter.includes(game.name))
         : collectionGames
     const gamesOwnedIds = filteredCollectionGames.map((game) => game.id)
     logger.trace(`gamesOwnedIds: "${JSON.stringify(gamesOwnedIds)}"`)
@@ -71,7 +71,7 @@ const logger = log4js.getLogger('index')
       username: env.BGG_USERNAME,
       include: ItemType.Expansion,
     })
-    const ownedExpansionIds = ownedExpansions.map((expansion) => expansion.id)
+    const ownedExpansionIds = ownedExpansions.filter((expansion) => expansion.owned).map((expansion) => expansion.id)
     logger.trace(`ownedExpansionIds: "${JSON.stringify(ownedExpansionIds)}"`)
 
     let unownedExpansionsCount = 0
