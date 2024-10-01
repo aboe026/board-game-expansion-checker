@@ -108,7 +108,19 @@ const logger = log4js.getLogger('index')
           )
         }
       }
-      await Emailer.send(unownedGameExpansions)
+      if (env.SMTP_HOST) {
+        const emailer = new Emailer({
+          host: env.SMTP_HOST,
+          port: env.SMTP_PORT,
+          secure: env.SMTP_SECURE,
+          username: env.SMTP_USERNAME,
+          password: env.SMTP_PASSWORD,
+          tlsCiphers: env.SMTP_TLS_CIPHERS,
+        })
+        await emailer.send(unownedGameExpansions)
+      } else {
+        logger.debug('Not sending email due to absence of SMTP_HOST environment variable.')
+      }
     }
   } catch (err: unknown) {
     logger.fatal(err)

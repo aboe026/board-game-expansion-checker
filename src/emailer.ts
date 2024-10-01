@@ -1,51 +1,75 @@
 import fs from 'fs/promises'
 import { getLogger } from 'log4js'
-import nodemailer from 'nodemailer'
+import nodemailer, { Transporter } from 'nodemailer'
+import SMTPTransport from 'nodemailer/lib/smtp-transport'
 
 import env from './env'
 import { GameWithExpansions } from './bgg-api'
 import path from 'path'
 
 /**
- * A static class to send Emails.
+ * A class to send Emails.
  */
 export default class Emailer {
   private static logger = getLogger('Emailer')
-  private static transporter = nodemailer.createTransport({
-    host: env.SMTP_HOST,
-    port: env.SMTP_PORT,
-    secure: env.SMTP_SECURE,
-    auth: {
-      user: env.SMTP_USERNAME,
-      pass: env.SMTP_PASSWORD,
-    },
-    tls: {
-      ciphers: env.SMTP_TLS_CIPHERS,
-    },
-  })
+  private transporter: Transporter
+
+  constructor({
+    host,
+    port,
+    secure,
+    tlsCiphers,
+    password,
+    username,
+  }: {
+    host: string
+    port: number
+    secure: boolean
+    username?: string
+    password?: string
+    tlsCiphers?: string
+  }) {
+    const options: SMTPTransport.Options = {
+      host,
+      port,
+      secure,
+    }
+    if (username) {
+      options.auth = {
+        user: username,
+        pass: password,
+      }
+    }
+    if (tlsCiphers) {
+      options.tls = {
+        ciphers: tlsCiphers,
+      }
+    }
+    this.transporter = nodemailer.createTransport(options)
+  }
 
   /**
-   * Send an email listing unowned expansions (if SMTP_HOST environment variable defined).
+   * Send an email listing unowned expansions.
    *
    * @param gamesWithExpansions The list of games and their associated expansions to email out.
    */
-  static async send(gamesWithExpansions: GameWithExpansions[]): Promise<void> {
-    if (env.SMTP_HOST) {
-      const template = await fs.readFile(path.join(__dirname, 'template.html'), {
-        encoding: 'utf-8',
-      })
+  async send(gamesWithExpansions: GameWithExpansions[]): Promise<void> {
+    const template = await fs.readFile(path.join(__dirname, 'template.html'), {
+      encoding: 'utf-8',
+    })
 
-      const response = await Emailer.transporter.sendMail({
-        from: env.SMTP_USERNAME,
-        to: env.SMTP_USERNAME,
-        subject: 'New Board Game Expansion(s) Available',
-        html: Emailer.getRenderedHtml({
-          template,
-          gamesWithExpansions,
-        }),
-      })
-      Emailer.logger.trace(`response: "${JSON.stringify(response)}"`)
-    }
+    const recipient = env.EMAIL_TO || env.SMTP_USERNAME
+    Emailer.logger.info(`Sending email from "${env.SMTP_USERNAME}" to "${recipient}"`)
+    const response = await this.transporter.sendMail({
+      from: env.SMTP_USERNAME,
+      to: recipient,
+      subject: 'New Board Game Expansion(s) Available',
+      html: this.getRenderedHtml({
+        template,
+        gamesWithExpansions,
+      }),
+    })
+    Emailer.logger.trace(`response: "${JSON.stringify(response)}"`)
   }
 
   /**
@@ -56,7 +80,7 @@ export default class Emailer {
    * @param config.template The HTML template containing placeholders to replacew with actual values.
    * @returns The template HTML with actual values substituted for placeholders.
    */
-  private static getRenderedHtml({
+  private getRenderedHtml({
     gamesWithExpansions,
     template,
   }: {
@@ -64,19 +88,19 @@ export default class Emailer {
     template: string
   }): string {
     // get template rows
-    const gameRowStart = Emailer.getBetweenWords({
+    const gameRowStart = this.getBetweenWords({
       sentence: template,
       start: '<!-- Game Row Start -->',
       end: '<!-- Expansion Row Start -->',
     })
     Emailer.logger.trace(`gameRowStart: "${gameRowStart}"`)
-    const gameRowEnd = Emailer.getBetweenWords({
+    const gameRowEnd = this.getBetweenWords({
       sentence: template,
       start: '<!-- Expansion Row End -->',
       end: '<!-- Game Row End -->',
     })
     Emailer.logger.trace(`gameRowEnd: "${gameRowEnd}"`)
-    const expansionRow = Emailer.getBetweenWords({
+    const expansionRow = this.getBetweenWords({
       sentence: template,
       start: '<!-- Expansion Row Start -->',
       end: '<!-- Expansion Row End -->',
@@ -84,7 +108,7 @@ export default class Emailer {
     Emailer.logger.trace(`expansionRow: "${expansionRow}"`)
 
     // construct rendered HTML from templates
-    let rendered = Emailer.getBetweenWords({
+    let rendered = this.getBetweenWords({
       sentence: template,
       end: '<!-- Game Row Start -->',
     })
@@ -107,7 +131,7 @@ export default class Emailer {
     }
 
     rendered += '\n'
-    rendered += Emailer.getBetweenWords({
+    rendered += this.getBetweenWords({
       sentence: template,
       start: '<!-- Game Row End -->',
     })
@@ -126,7 +150,7 @@ export default class Emailer {
    * @param config.end The ending boundry of the substring to extract. This word will be excluded in that substring.
    * @returns The substring between the 2 words, excluding the start and end words.
    */
-  private static getBetweenWords({ sentence, start, end }: { sentence: string; start?: string; end?: string }): string {
+  private getBetweenWords({ sentence, start, end }: { sentence: string; start?: string; end?: string }): string {
     const startIndex = start ? sentence.indexOf(start) + start.length : 0
     const endIndex = end ? sentence.lastIndexOf(end) : sentence.length
 
