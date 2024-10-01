@@ -46,24 +46,24 @@ export default cleanEnv(process.env, {
     desc: 'The hostname of the SMTP server to use for sending emails.',
     default: '',
   }),
-  SMTP_PORT: num({
-    desc: 'The port of the SMTP server to use for sending emails.',
-    default: 587,
-  }),
-  SMTP_SECURE: bool({
-    desc: 'Set to true if SMTP_PORT is 465.',
-    default: false,
-  }),
-  SMTP_USERNAME: str({
-    desc: 'The username for authentication when sending emails.',
-    default: '',
-  }),
   SMTP_PASSWORD: str({
     desc: 'The password for authentication when sending emails.',
     default: '',
   }),
+  SMTP_PORT: num({
+    desc: 'The port of the SMTP server to use for sending emails.',
+    default: 465,
+  }),
+  SMTP_SECURE: bool({
+    desc: 'Set to true if SMTP_PORT is 465.',
+    default: true,
+  }),
   SMTP_TLS_CIPHERS: str({
     desc: 'The ciphers to use for TLS communication when sending emails.',
+    default: '',
+  }),
+  SMTP_USERNAME: str({
+    desc: 'The username for authentication when sending emails.',
     default: '',
   }),
 })
