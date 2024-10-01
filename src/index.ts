@@ -129,12 +129,24 @@ async function getGamesToIgnore(): Promise<string[]> {
   return gameNames
 }
 
+/**
+ * Gets array of expansions to ignore (if any).
+ *
+ * @returns An array of expansion names to ignore.
+ */
 async function getExpansionsToIgnore(): Promise<string[]> {
   const expansionNames = await getFileItems(env.EXPANSION_IGNORE_FILE_PATH, 'EXPANSION_IGNORE_FILE_PATH')
   logger.debug(`Excluding expansions: "${JSON.stringify(expansionNames)}"`)
   return expansionNames
 }
 
+/**
+ * Gets the items in a newline-separated file, exluding empty lines and lines starting with comment character (#).
+ *
+ * @param filePath The path to the file on the system containing the newline-separated list of items to extract.
+ * @param envVarName The environment variable defining the path to the file, used for logging.
+ * @returns An array of items in the file, ignoring empty lines and lines starting with the comment character (#).
+ */
 async function getFileItems(filePath: string, envVarName: string): Promise<string[]> {
   const items: string[] = []
   if (filePath) {

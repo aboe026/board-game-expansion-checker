@@ -5,9 +5,21 @@ import sleep from './sleep'
 import chunk from './chunks'
 import env from './env'
 
+/**
+ * A static class to interact with the Board Game Geek website.
+ */
 export default class BggApi {
   private static logger = getLogger('BggApi')
 
+  /**
+   * Get all games in a collection of a certain type.
+   *
+   * @param config The configuration of games to retrieve.
+   * @param config.exclude The type of game to exclude in results.
+   * @param config.include The type of game to include in results.
+   * @param config.username The name of the user to scope the collection games to.
+   * @returns The games in the users collection.
+   */
   static async getCollectionGames({
     exclude,
     include,
@@ -37,6 +49,14 @@ export default class BggApi {
     return games
   }
 
+  /**
+   * Get board games by their ids and type.
+   *
+   * @param config The configuration of which board games to get.
+   * @param config.ids The IDs of the board games to retreive.
+   * @param config.type The board game type to scope results to.
+   * @returns The board games with the given ids and type.
+   */
   static async getGames({ ids, type }: { ids: number[]; type: ItemType }): Promise<BoardGame[]> {
     const games: BoardGame[] = []
     const chunks = chunk(ids, 20)
@@ -63,6 +83,12 @@ export default class BggApi {
     return games
   }
 
+  /**
+   * Send a request to the Board Game Geek website. Will automatically retry requests if queued.
+   *
+   * @param path The path on the Board Game Geek XML api (v2) to request.
+   * @returns The JSON representation of the data returned from the endpoint.
+   */
   private static async request<T>(path: string): Promise<T> {
     const url = `https://boardgamegeek.com/xmlapi2/${path}`
     BggApi.logger.trace(`request - Sending request to URL: "${url}"`)
@@ -103,6 +129,11 @@ export interface BoardGame {
     type: string
     value: string
   }[]
+}
+
+export interface GameWithExpansions {
+  game: BoardGame
+  expansions: BoardGame[]
 }
 
 interface CollectionResponse {
@@ -160,9 +191,4 @@ interface GamesResponse {
       }[]
     }[]
   }
-}
-
-export interface GameWithExpansions {
-  game: BoardGame
-  expansions: BoardGame[]
 }

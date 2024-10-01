@@ -2,6 +2,13 @@ import { getLogger } from 'log4js'
 
 const logger = getLogger('chunk')
 
+/**
+ * Break an array into smaller arrays with each sub-array no larger than maxPer.
+ *
+ * @param items The items to break into smaller arrays.
+ * @param maxPer The maximum length of each sub-array.
+ * @returns An array containing the sub-arrays of items.
+ */
 export default function chunk<T>(items: T[], maxPer: number): T[][] {
   logger.trace(`items: "${JSON.stringify(items)}"`)
   logger.trace(`maxPer: "${maxPer}"`)

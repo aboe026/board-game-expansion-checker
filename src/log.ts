@@ -2,7 +2,13 @@ import log4js, { Appender } from 'log4js'
 
 import env from './env'
 
+/**
+ * A static class to configure logging.
+ */
 export default class Log {
+  /**
+   * Configures the logger for the output.
+   */
   static configure() {
     const appenders: Appenders = {
       console: { type: 'console' },

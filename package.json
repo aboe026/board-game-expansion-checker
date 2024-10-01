@@ -11,8 +11,8 @@
     "url": "https://github.com/aboe026/typescript-template/issues"
   },
   "engines": {
-    "node": ">=18.14.2",
-    "npm": ">=9.5.0"
+    "node": ">=20.17.0",
+    "npm": ">=10.8.2"
   },
   "main": "src/index.ts",
   "scripts": {
