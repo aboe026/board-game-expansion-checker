@@ -1,8 +1,12 @@
-import { cleanEnv, num, str } from 'envalid'
+import { bool, cleanEnv, email, num, str } from 'envalid'
 
 export default cleanEnv(process.env, {
   BGG_USERNAME: str({
     desc: 'The Board Game Geek username to scope owned games to.',
+  }),
+  EMAIL_TO: email({
+    desc: 'The email address to send emails to. Defaults to SMTP_USERNAME if not provided.',
+    default: '',
   }),
   EXPANSION_IGNORE_FILE_PATH: str({
     desc: 'Path to file containing newline separated list of expansion names to ignore.',
@@ -37,5 +41,29 @@ export default cleanEnv(process.env, {
   RETRY_WAIT_SECONDS: num({
     desc: 'The amount of seconds to wait to retry a request if initially rejected for processing.',
     default: 5,
+  }),
+  SMTP_HOST: str({
+    desc: 'The hostname of the SMTP server to use for sending emails.',
+    default: '',
+  }),
+  SMTP_PASSWORD: str({
+    desc: 'The password for authentication when sending emails.',
+    default: '',
+  }),
+  SMTP_PORT: num({
+    desc: 'The port of the SMTP server to use for sending emails.',
+    default: 465,
+  }),
+  SMTP_SECURE: bool({
+    desc: 'Set to true if SMTP_PORT is 465.',
+    default: true,
+  }),
+  SMTP_TLS_CIPHERS: str({
+    desc: 'The ciphers to use for TLS communication when sending emails.',
+    default: '',
+  }),
+  SMTP_USERNAME: str({
+    desc: 'The username for authentication when sending emails.',
+    default: '',
   }),
 })

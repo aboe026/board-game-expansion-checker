@@ -62,17 +62,24 @@ yarn start
 
 The script takes the following environment variables:
 
-| Name                       | Required | Default | Description                                                                                                                   | Example(s)             |
-| -------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
-| BGG_USERNAME               | Yes      |         | The Board Game Geek username to scope owned games to.                                                                         | bond007                |
-| EXPANSION_IGNORE_FILE_PATH | No       |         | Path to file containing newline separated list of expansion names to ignore.                                                  | expansionsToIgnore.txt |
-| GAME_IGNORE_FILE_PATH      | No       |         | Path to file containing newline separated list of board game names to ignore.                                                 | gamesToIgnore.txt      |
-| LOG_FILE_BACKUPS           | Yes      | 0       | The number of old log files to keep during log rolling (excluding the hot file).                                              | 5                      |
-| LOG_FILE_MAX_SIZE_UNITS    | Yes      | M       | The units for the maximum log file size. Used in conjunction with LOG_FILE_MAX_SIZE_VALUE.                                    | G                      |
-| LOG_FILE_MAX_SIZE_VALUE    | Yes      | 10      | The maximum size of the log file. Units specified with LOG_FILE_MAX_SIZE_UNITS.                                               | 3                      |
-| LOG_FILE_NAME              | No       |         | The name of a file to output logs to.                                                                                         | output.log             |
-| LOG_LEVEL                  | Yes      | INFO    | The minimum granularity level of log messages that should be output. OFF < FATAL < ERROR < WARN < INFO < DEBUG < TRACE < ALL. | DEBUG                  |
-| RETRY_WAIT_SECONDS         | Yes      | 5       | The amount of seconds to wait to retry a request if initially rejected for processing.                                        | 10                     |
+| Name                       | Required | Default         | Description                                                                                                                   | Example(s)             |
+| -------------------------- | -------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| BGG_USERNAME               | Yes      |                 | The Board Game Geek username to scope owned games to.                                                                         | bond007                |
+| EMAIL_TO                   | No       | `SMTP_USERNAME` | The email address to send emails to. Defaults to SMTP_USERNAME if not provided.                                               | james.bond@mi6.com     |
+| EXPANSION_IGNORE_FILE_PATH | No       |                 | Path to file containing newline separated list of expansion names to ignore.                                                  | expansionsToIgnore.txt |
+| GAME_IGNORE_FILE_PATH      | No       |                 | Path to file containing newline separated list of board game names to ignore.                                                 | gamesToIgnore.txt      |
+| LOG_FILE_BACKUPS           | Yes      | 0               | The number of old log files to keep during log rolling (excluding the hot file).                                              | 5                      |
+| LOG_FILE_MAX_SIZE_UNITS    | Yes      | M               | The units for the maximum log file size. Used in conjunction with LOG_FILE_MAX_SIZE_VALUE.                                    | G                      |
+| LOG_FILE_MAX_SIZE_VALUE    | Yes      | 10              | The maximum size of the log file. Units specified with LOG_FILE_MAX_SIZE_UNITS.                                               | 3                      |
+| LOG_FILE_NAME              | No       |                 | The name of a file to output logs to.                                                                                         | output.log             |
+| LOG_LEVEL                  | Yes      | INFO            | The minimum granularity level of log messages that should be output. OFF < FATAL < ERROR < WARN < INFO < DEBUG < TRACE < ALL. | DEBUG                  |
+| RETRY_WAIT_SECONDS         | Yes      | 5               | The amount of seconds to wait to retry a request if initially rejected for processing.                                        | 10                     |
+| SMTP_HOST                  | No       |                 | The hostname of the SMTP server to use for sending emails.                                                                    | smtp.gmail.com         |
+| SMTP_PASSWORD              | No       |                 | The password for authentication when sending emails.                                                                          | 007                    |
+| SMTP_PORT                  | No       | 465             | The port of the SMTP server to use for sending emails.                                                                        | 587                    |
+| SMTP_SECURE                | No       | true            | Set to true if SMTP_PORT is 465.                                                                                              | false                  |
+| SMTP_TLS_CIPHERS           | No       |                 | The ciphers to use for TLS communication when sending emails.                                                                 | SSLv3                  |
+| SMTP_USERNAME              | No       |                 | The username for authentication when sending emails.                                                                          | james.bond@mi6.com     |
 
 ## Build
 

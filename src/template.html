@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+
+      .main {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <table>
+        <caption>
+          {EXPS_NUMBER} New Expansion(s) Available
+        </caption>
+        <thead>
+          <tr>
+            <th>Game</th>
+            <th>Expansion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Game Row Start -->
+          <tr>
+            <td>
+              <a href="https://boardgamegeek.com/boardgame/{GAME_ID}">{GAME_NAME}</a>
+            </td>
+            <td>
+              <ul>
+                <!-- Expansion Row Start -->
+                <li>
+                  <a href="https://boardgamegeek.com/boardgameexpansion/{EXPANSION_ID}">{EXPANSION_NAME}</a>
+                </li>
+                <!-- Expansion Row End -->
+              </ul>
+            </td>
+          </tr>
+          <!-- Game Row End -->
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

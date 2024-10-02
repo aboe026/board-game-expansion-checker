@@ -7,6 +7,7 @@ import path from 'path'
 import BggApi, { BoardGame, GameWithExpansions, ItemType } from './bgg-api'
 import env from './env'
 import Log from './log'
+import Emailer from './emailer'
 
 Log.configure()
 const logger = log4js.getLogger('index')
@@ -107,6 +108,19 @@ const logger = log4js.getLogger('index')
           )
         }
       }
+      if (env.SMTP_HOST) {
+        const emailer = new Emailer({
+          host: env.SMTP_HOST,
+          port: env.SMTP_PORT,
+          secure: env.SMTP_SECURE,
+          username: env.SMTP_USERNAME,
+          password: env.SMTP_PASSWORD,
+          tlsCiphers: env.SMTP_TLS_CIPHERS,
+        })
+        await emailer.send(unownedGameExpansions)
+      } else {
+        logger.debug('Not sending email due to absence of SMTP_HOST environment variable.')
+      }
     }
   } catch (err: unknown) {
     logger.fatal(err)
@@ -127,12 +141,24 @@ async function getGamesToIgnore(): Promise<string[]> {
   return gameNames
 }
 
+/**
+ * Gets array of expansions to ignore (if any).
+ *
+ * @returns An array of expansion names to ignore.
+ */
 async function getExpansionsToIgnore(): Promise<string[]> {
   const expansionNames = await getFileItems(env.EXPANSION_IGNORE_FILE_PATH, 'EXPANSION_IGNORE_FILE_PATH')
   logger.debug(`Excluding expansions: "${JSON.stringify(expansionNames)}"`)
   return expansionNames
 }
 
+/**
+ * Gets the items in a newline-separated file, exluding empty lines and lines starting with comment character (#).
+ *
+ * @param filePath The path to the file on the system containing the newline-separated list of items to extract.
+ * @param envVarName The environment variable defining the path to the file, used for logging.
+ * @returns An array of items in the file, ignoring empty lines and lines starting with the comment character (#).
+ */
 async function getFileItems(filePath: string, envVarName: string): Promise<string[]> {
   const items: string[] = []
   if (filePath) {
