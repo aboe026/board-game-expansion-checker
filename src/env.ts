@@ -38,6 +38,10 @@ export default cleanEnv(process.env, {
     choices: ['OFF', 'FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE', 'ALL'],
     default: 'INFO',
   }),
+  RETRY_ATTEMPTS: num({
+    desc: 'The amount of times to retry a request if rejected for processing.',
+    default: 5,
+  }),
   RETRY_WAIT_SECONDS: num({
     desc: 'The amount of seconds to wait to retry a request if initially rejected for processing.',
     default: 5,

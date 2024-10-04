@@ -74,6 +74,7 @@ The script takes the following environment variables:
 | LOG_FILE_NAME              | No       |                 | The name of a file to output logs to.                                                                                         | output.log             |
 | LOG_LEVEL                  | Yes      | INFO            | The minimum granularity level of log messages that should be output. OFF < FATAL < ERROR < WARN < INFO < DEBUG < TRACE < ALL. | DEBUG                  |
 | RETRY_WAIT_SECONDS         | Yes      | 5               | The amount of seconds to wait to retry a request if initially rejected for processing.                                        | 10                     |
+| RETRY_ATTEMPTS             | Yes      | 5               | The amount of times to retry a request if rejected for processing.                                                            | 10                     |
 | SMTP_HOST                  | No       |                 | The hostname of the SMTP server to use for sending emails.                                                                    | smtp.gmail.com         |
 | SMTP_PASSWORD              | No       |                 | The password for authentication when sending emails.                                                                          | 007                    |
 | SMTP_PORT                  | No       | 465             | The port of the SMTP server to use for sending emails.                                                                        | 587                    |

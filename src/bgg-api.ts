@@ -92,16 +92,25 @@ export default class BggApi {
   private static async request<T>(path: string): Promise<T> {
     const url = `https://boardgamegeek.com/xmlapi2/${path}`
     BggApi.logger.trace(`request - Sending request to URL: "${url}"`)
-    let response = await fetch(url)
-    const status = response.status
-    BggApi.logger.trace(`request - status: "${response.status}"`)
-    if (status === 202) {
-      BggApi.logger.debug(`Retrying request in "${env.RETRY_WAIT_SECONDS}" seconds...`)
-      await sleep(env.RETRY_WAIT_SECONDS)
-      response = await fetch(url)
+    let attempt = 0
+    let text: string | undefined = undefined
+    while (text === undefined && attempt < env.RETRY_ATTEMPTS) {
+      attempt++
+      BggApi.logger.debug(`Attempt ${attempt}/${env.RETRY_ATTEMPTS} for endpoint "${path}"`)
+      const response = await fetch(url)
+      const status = response.status
+      BggApi.logger.trace(`request - status: "${response.status}"`)
+      if (status === 202) {
+        BggApi.logger.debug(`Retrying request in "${env.RETRY_WAIT_SECONDS}" seconds...`)
+        await sleep(env.RETRY_WAIT_SECONDS)
+      } else {
+        text = await response.text()
+      }
     }
-    const text = await response.text()
     BggApi.logger.trace(`request - text: "${text}"`)
+    if (!text) {
+      throw Error(`Could not get response for endpoint "${path}" in "${env.RETRY_ATTEMPTS}" attempts.`)
+    }
     const json = await xml2js.parseStringPromise(text)
     BggApi.logger.trace(`request - json: "${JSON.stringify(json)}"`)
     return json as T
