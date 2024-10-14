@@ -53,21 +53,14 @@ export default class Emailer {
    *
    * @param gamesWithExpansions The list of games and their associated expansions to email out.
    */
-  async send(gamesWithExpansions: GameWithExpansions[]): Promise<void> {
-    const template = await fs.readFile(path.join(__dirname, 'template.html'), {
-      encoding: 'utf-8',
-    })
-
+  async send({ subject, html }: { subject: string; html?: string }): Promise<void> {
     const recipient = env.EMAIL_TO || env.SMTP_USERNAME
     Emailer.logger.info(`Sending email from "${env.SMTP_USERNAME}" to "${recipient}"`)
     const response = await this.transporter.sendMail({
       from: env.SMTP_USERNAME,
       to: recipient,
-      subject: 'New Board Game Expansion(s) Available',
-      html: this.getRenderedHtml({
-        template,
-        gamesWithExpansions,
-      }),
+      subject,
+      html,
     })
     Emailer.logger.trace(`response: "${JSON.stringify(response)}"`)
   }
@@ -80,13 +73,12 @@ export default class Emailer {
    * @param config.template The HTML template containing placeholders to replacew with actual values.
    * @returns The template HTML with actual values substituted for placeholders.
    */
-  private getRenderedHtml({
-    gamesWithExpansions,
-    template,
-  }: {
-    gamesWithExpansions: GameWithExpansions[]
-    template: string
-  }): string {
+  async getHtmlFromGames({ gamesWithExpansions }: { gamesWithExpansions: GameWithExpansions[] }): Promise<string> {
+    const template = await fs.readFile(path.join(__dirname, 'html-templates', 'expansions-found-template.html'), {
+      encoding: 'utf-8',
+    })
+    Emailer.logger.trace(`getHtmlFromGames template: "${template}"`)
+
     // get template rows
     const gameRowStart = this.getBetweenWords({
       sentence: template,
@@ -137,6 +129,19 @@ export default class Emailer {
     })
     rendered = rendered.replace('{EXPS_NUMBER}', expansionsCount.toString())
     Emailer.logger.trace(`rendered after: "${rendered}"`)
+
+    return rendered
+  }
+
+  async getHtmlForFailure({ failure }: { failure: string }): Promise<string> {
+    const template = await fs.readFile(path.join(__dirname, 'html-templates', 'failed-template.html'), {
+      encoding: 'utf-8',
+    })
+    Emailer.logger.trace(`getHtmlForFailure template: "${template}"`)
+
+    const rendered = template.replace('{EXCEPTION_STACK_TRACE}', failure)
+
+    Emailer.logger.trace(`getHtmlForFailure rendered: "${rendered}"`)
 
     return rendered
   }
