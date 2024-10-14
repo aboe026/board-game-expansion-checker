@@ -131,9 +131,12 @@ const logger = log4js.getLogger('index')
     logger.fatal(err)
 
     if (env.SMTP_HOST) {
+      const error = err as Error
       await emailer.send({
         subject: 'Board Game Checker Failed',
-        html: await emailer.getHtmlForFailure((err as any).toString()),
+        html: await emailer.getHtmlForFailure({
+          failure: (error.stack || error.message).replace(/\n|\r\n/g, '<br />').replace(/    /g, '<dd />'),
+        }),
       })
     } else {
       logger.debug('Not sending failure email due to absence of SMTP_HOST environment variable.')
