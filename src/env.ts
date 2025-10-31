@@ -1,6 +1,9 @@
 import { bool, cleanEnv, email, num, str } from 'envalid'
 
 export default cleanEnv(process.env, {
+  BGG_API_TOKEN: str({
+    desc: 'The Board Game Geek API Access Token required to make requests against their API.',
+  }),
   BGG_USERNAME: str({
     desc: 'The Board Game Geek username to scope owned games to.',
   }),

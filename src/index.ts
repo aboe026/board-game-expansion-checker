@@ -16,6 +16,9 @@ const logger = log4js.getLogger('index')
  * Main entrypoint
  */
 ;(async () => {
+  const api = new BggApi({
+    token: env.BGG_API_TOKEN,
+  })
   const emailer = new Emailer({
     host: env.SMTP_HOST,
     port: env.SMTP_PORT,
@@ -29,7 +32,7 @@ const logger = log4js.getLogger('index')
     const expansionFilter = await getExpansionsToIgnore()
 
     logger.info('Getting collection...')
-    const collectionGames = await BggApi.getCollectionGames({
+    const collectionGames = await api.getCollectionGames({
       username: env.BGG_USERNAME,
       include: ItemType.BoardGame,
       exclude: ItemType.Expansion,
@@ -42,7 +45,7 @@ const logger = log4js.getLogger('index')
     logger.trace(`gamesOwnedIds: "${JSON.stringify(gamesOwnedIds)}"`)
 
     logger.info(`Getting details of "${gamesOwnedIds.length}" game${gamesOwnedIds.length > 1 ? 's' : ''}...`)
-    const games = await BggApi.getGames({
+    const games = await api.getGames({
       ids: gamesOwnedIds,
       type: ItemType.BoardGame,
     })
@@ -69,13 +72,13 @@ const logger = log4js.getLogger('index')
     logger.info(
       `Getting "${expansionIds.length}" expansion${expansionIds.length > 1 ? 's' : ''} for all games in collection...`
     )
-    const possibleExpansions = await BggApi.getGames({
+    const possibleExpansions = await api.getGames({
       ids: expansionIds,
       type: ItemType.Expansion,
     })
 
     logger.info('Getting expansions owned in collection...')
-    const ownedExpansions = await BggApi.getCollectionGames({
+    const ownedExpansions = await api.getCollectionGames({
       username: env.BGG_USERNAME,
       include: ItemType.Expansion,
     })

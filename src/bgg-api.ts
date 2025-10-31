@@ -9,7 +9,12 @@ import env from './env'
  * A static class to interact with the Board Game Geek website.
  */
 export default class BggApi {
-  private static logger = getLogger('BggApi')
+  private logger = getLogger('BggApi')
+  private token: string
+
+  constructor({ token }: { token: string }) {
+    this.token = token
+  }
 
   /**
    * Get all games in a collection of a certain type.
@@ -20,7 +25,7 @@ export default class BggApi {
    * @param config.username The name of the user to scope the collection games to.
    * @returns The games in the users collection.
    */
-  static async getCollectionGames({
+  async getCollectionGames({
     exclude,
     include,
     username,
@@ -36,7 +41,7 @@ export default class BggApi {
     if (exclude) {
       queryParams.push(`excludesubtype=${exclude}`)
     }
-    const response = await BggApi.request<CollectionResponse>(`collection?${queryParams.join('&')}`)
+    const response = await this.request<CollectionResponse>(`collection?${queryParams.join('&')}`)
     const games: CollectionGame[] = response.items.item.map((item) => {
       return {
         id: Number(item.$.objectid),
@@ -45,7 +50,7 @@ export default class BggApi {
         owned: item.status[0].$.own === '1',
       }
     })
-    BggApi.logger.trace(`getCollectionGames games: "${JSON.stringify(games)}"`)
+    this.logger.trace(`getCollectionGames games: "${JSON.stringify(games)}"`)
     return games
   }
 
@@ -57,12 +62,12 @@ export default class BggApi {
    * @param config.type The board game type to scope results to.
    * @returns The board games with the given ids and type.
    */
-  static async getGames({ ids, type }: { ids: number[]; type: ItemType }): Promise<BoardGame[]> {
+  async getGames({ ids, type }: { ids: number[]; type: ItemType }): Promise<BoardGame[]> {
     const games: BoardGame[] = []
     const chunks = chunk(ids, 20)
     for (const chunk of chunks) {
       const queryParams = [`id=${chunk.join(',')}`, `type=${type}`].join('&')
-      const batch = await BggApi.request<GamesResponse>(`thing?${queryParams}`)
+      const batch = await this.request<GamesResponse>(`thing?${queryParams}`)
       for (const item of batch.items.item) {
         games.push({
           id: Number(item.$.id),
@@ -78,7 +83,7 @@ export default class BggApi {
         })
       }
     }
-    BggApi.logger.trace(`getGames games: "${JSON.stringify(games)}"`)
+    this.logger.trace(`getGames games: "${JSON.stringify(games)}"`)
 
     return games
   }
@@ -89,30 +94,37 @@ export default class BggApi {
    * @param path The path on the Board Game Geek XML api (v2) to request.
    * @returns The JSON representation of the data returned from the endpoint.
    */
-  private static async request<T>(path: string): Promise<T> {
+  private async request<T>(path: string): Promise<T> {
     const url = `https://boardgamegeek.com/xmlapi2/${path}`
-    BggApi.logger.trace(`request - Sending request to URL: "${url}"`)
+    this.logger.trace(`request - Sending request to URL: "${url}"`)
     let attempt = 0
     let text: string | undefined = undefined
     while (text === undefined && attempt < env.RETRY_ATTEMPTS) {
       attempt++
-      BggApi.logger.debug(`Attempt ${attempt}/${env.RETRY_ATTEMPTS} for endpoint "${path}"`)
-      const response = await fetch(url)
+      this.logger.debug(`Attempt ${attempt}/${env.RETRY_ATTEMPTS} for endpoint "${path}"`)
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      })
       const status = response.status
-      BggApi.logger.trace(`request - status: "${response.status}"`)
+      this.logger.trace(`request - status: "${response.status}"`)
       if (status === 202) {
-        BggApi.logger.debug(`Retrying request in "${env.RETRY_WAIT_SECONDS}" seconds...`)
+        this.logger.debug(`Retrying request in "${env.RETRY_WAIT_SECONDS}" seconds...`)
         await sleep(env.RETRY_WAIT_SECONDS)
       } else {
-        text = await response.text()
+        const responseText = await response.text()
+        if (responseText) {
+          text = responseText
+        }
       }
     }
-    BggApi.logger.trace(`request - text: "${text}"`)
+    this.logger.trace(`request - text: "${text}"`)
     if (!text) {
       throw Error(`Could not get response for endpoint "${path}" in "${env.RETRY_ATTEMPTS}" attempts.`)
     }
     const json = await xml2js.parseStringPromise(text)
-    BggApi.logger.trace(`request - json: "${JSON.stringify(json)}"`)
+    this.logger.trace(`request - json: "${JSON.stringify(json)}"`)
     return json as T
   }
 }
