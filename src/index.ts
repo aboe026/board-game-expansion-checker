@@ -4,7 +4,7 @@ import fs from 'fs/promises'
 import log4js from 'log4js'
 import path from 'path'
 
-import BggApi, { BoardGame, GameWithExpansions, ItemType } from './bgg-api'
+import BggApi, { GameWithExpansions, ItemType } from './bgg-api'
 import env from './env'
 import Log from './log'
 import Emailer from './emailer'
@@ -51,7 +51,7 @@ const logger = log4js.getLogger('index')
     })
     const expansionIds: number[] = []
     const expansionToBaseGameMap: {
-      [expansionId: number]: BoardGame
+      [expansionId: number]: number[]
     } = {}
     for (const game of games) {
       if (game.links) {
@@ -62,8 +62,13 @@ const logger = log4js.getLogger('index')
           } else if (expansionFilter.includes(link.value)) {
             logger.debug(`Ignoring expansion "${link.value}" due to it being in expansion ignore list`)
           } else {
-            expansionIds.push(link.id)
-            expansionToBaseGameMap[link.id] = game
+            if (!expansionIds.includes(link.id)) {
+              expansionIds.push(link.id)
+            }
+            if (!expansionToBaseGameMap[link.id]) {
+              expansionToBaseGameMap[link.id] = []
+            }
+            expansionToBaseGameMap[link.id].push(game.id)
           }
         }
       }
@@ -93,17 +98,24 @@ const logger = log4js.getLogger('index')
         logger.debug(`Expansion "${possibleExpansion.name}" already owned`)
       } else {
         unownedExpansionsCount++
-        const baseGame = expansionToBaseGameMap[possibleExpansion.id]
-        logger.trace(`baseGame: "${JSON.stringify(baseGame)}"`)
-        const index = unownedGameExpansions.findIndex((gameWithExpansion) => gameWithExpansion.game.id === baseGame.id)
-        logger.trace(`index: "${JSON.stringify(index)}"`)
-        if (index < 0) {
-          unownedGameExpansions.push({
-            game: baseGame,
-            expansions: [possibleExpansion],
-          })
-        } else {
-          unownedGameExpansions[index].expansions.push(possibleExpansion)
+        for (const baseGameId of expansionToBaseGameMap[possibleExpansion.id]) {
+          const baseGame = games.find((game) => game.id === baseGameId)
+          if (!baseGame) {
+            throw Error(`Could not find base game with ID "${baseGameId}"`)
+          }
+          logger.trace(`baseGame: "${JSON.stringify(baseGame)}"`)
+          const index = unownedGameExpansions.findIndex(
+            (gameWithExpansion) => gameWithExpansion.game.id === baseGame.id
+          )
+          logger.trace(`index: "${JSON.stringify(index)}"`)
+          if (index < 0) {
+            unownedGameExpansions.push({
+              game: baseGame,
+              expansions: [possibleExpansion],
+            })
+          } else {
+            unownedGameExpansions[index].expansions.push(possibleExpansion)
+          }
         }
       }
     }
