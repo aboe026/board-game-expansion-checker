@@ -48,6 +48,7 @@ export default class BggApi {
         name: item.name[0]._,
         year: Number(item.yearpublished),
         owned: item.status[0].$.own === '1',
+        preordered: item.status[0].$.preordered === '1',
       }
     })
     this.logger.trace(`getCollectionGames games: "${JSON.stringify(games)}"`)
@@ -139,6 +140,7 @@ interface CollectionGame {
   year: number
   id: number
   owned: boolean
+  preordered: boolean
 }
 
 export interface BoardGame {
